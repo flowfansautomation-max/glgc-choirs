@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GLGC Choirs — Weekly Reports</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css?v=1">
+  <script src="config.js?v=1"></script><script src="roster.js?v=1"></script><script src="manual.js?v=1"></script><script src="data.js?v=1"></script>
+</head>
+<body>
+  <div class="deck" id="deck"></div>
+  <div class="ctl"><button id="prev">‹ Prev</button><select id="jump"></select><button id="next">Next ›</button><span class="pos" id="pos"></span></div>
+<script>
+var valueLabels = { id:'valueLabels', afterDatasetsDraw:function (chart) { var ctx = chart.ctx;
+  chart.data.datasets.forEach(function (ds, di) { var meta = chart.getDatasetMeta(di); if (meta.hidden) return;
+    meta.data.forEach(function (el, i) { var v = ds.data[i]; if (v == null) return;
+      ctx.save(); ctx.fillStyle = ds.money ? '#f2938b' : '#fff'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(ds.money ? 'GHS ' + v : v, el.x, el.y - 4); ctx.restore(); }); }); } };
+function chart(canvas, labels, datasets) {
+  var scales = { x:{ ticks:{color:'#ddd',font:{size:12}}, grid:{display:false}, border:{color:'#fff'} },
+                 y:{ display:false, beginAtZero:true, grace:'30%' }, y1:{ display:false, beginAtZero:true, grace:'30%', position:'right' } };
+  return new Chart(canvas, { type:'bar', plugins:[valueLabels], data:{ labels:labels, datasets:datasets },
+    options:{ responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ top:18 } }, plugins:{ legend:{display:false} }, scales:scales } }); }
+function plain(label, data, color) { return { label:label, data:data, backgroundColor:color, borderRadius:4, maxBarThickness:44, yAxisID:'y' }; }
+function money(label, data) { return { label:label, data:data, backgroundColor:'#e2574c', borderRadius:4, maxBarThickness:44, money:true, yAxisID:'y1' }; }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]; }); }
+function initials(n) { return n.split(/[\s-]+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase() || '?'; }
+function face(g, cls) { return g.photo ? '<img class="' + cls + '" src="' + esc(g.photo) + '" alt="">' : '<div class="' + cls + '">' + initials(g.name) + '</div>'; }
+function sw(c) { return '<span><i class="sw" style="background:' + c + '"></i> '; }
+function hm(d) { var h = d.getHours(), m = d.getMinutes(); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'); }
+
+CH.load(function (M) {
+  var deck = document.getElementById('deck'), slides = [], W = M.weeks, last = W[W.length - 1], labels = W.map(function (w) { return ['WK ' + w.wk, w.label]; });
+  var k = last ? last.key : null, NG = M.govs.length;
+  if (M.sample) document.body.insertAdjacentHTML('afterbegin', '<div class="sample">SAMPLE NUMBERS — the two forms are not connected yet</div>');
+  var weekTxt = last ? 'WK ' + last.wk + ' · weekend ending Sunday ' + esc(last.label) + ' ' + last.date.getFullYear() : 'No reports yet';
+
+  // ---- cover ----
+  slides.push({ title:'Cover', html:'<div class="cover"><div class="t1">GLGC Choirs</div><div class="t2">Weekly Reports</div><div class="t3">Rehearsal · Outreach · Sunday<br><br>' + weekTxt + '</div></div>' });
+
+  // ---- weekly summary ----
+  function cell(v) { return v == null ? '<td class="nr">—</td>' : '<td>' + v + '</td>'; }
+  function cellG(v) { return v == null ? '<td class="nr">—</td>' : '<td>GHS ' + v + '</td>'; }
+  var satIn = 0, sunIn = 0; if (k != null) M.govs.forEach(function (g) { if (M.hasSat(g.name, k)) satIn++; if (M.hasSun(g.name, k)) sunIn++; });
+  var tiles = last ? [
+      ['Souls won', M.sum(M.govs, k, 'souls'), '#ffb020'], ['Rehearsal attendance', M.sum(M.govs, k, 'reh_att'), 'var(--purple)'],
+      ['Rehearsal offering', 'GHS ' + M.sum(M.govs, k, 'reh_off'), 'var(--pink)'], ['Sunday attendance', M.sum(M.govs, k, 'sun_att'), 'var(--sun)'],
+      ['New members (DSF)', M.sum(M.govs, k, 'dsf_new'), 'var(--green)'],
+      ['Reports in', '<span style="font-size:.6em">Sat</span> ' + satIn + '<small>/' + NG + '</small> <span style="font-size:.6em">Sun</span> ' + sunIn + '<small>/' + NG + '</small>', 'var(--blue)'] ] : [];
+  var rowsHtml = M.choirs.map(function (c) {
+    return c.governors.map(function (g, gi) { function v(it) { return k == null ? null : M.get(g.name, k, it); }
+      return '<tr' + (gi === 0 ? ' class="cfirst"' : '') + '>' + (gi === 0 ? '<td class="cn" rowspan="' + c.governors.length + '">' + c.n + '. ' + esc(c.name) + '</td>' : '') +
+        '<td class="gv">' + esc(g.name) + '</td>' + cell(v('souls')) + cell(v('reh_att')) + cellG(v('reh_off')) + cell(v('sun_att')) + cell(v('dsf_new')) + '</tr>'; }).join(''); }).join('');
+  slides.push({ title:'Weekly summary', html:
+    '<div class="head"><div class="name">Weekly Summary</div><div class="choir">GLGC Choirs</div><div class="gov">' + weekTxt + ' · 14 choirs · ' + NG + ' governors</div></div>' +
+    '<div class="sumwrap"><div class="kpis compact" style="grid-template-columns:repeat(6,1fr)">' + tiles.map(function (t) { return '<div class="kpi" style="--kc:' + t[2] + '"><div class="lab">' + t[0] + '</div><div class="val">' + t[1] + '</div></div>'; }).join('') + '</div>' +
+    '<div class="sumtbl"><table><thead><tr><th>Choir</th><th>Governor</th><th>Souls won</th><th>Rehearsal</th><th>Rehearsal offering</th><th>Sunday</th><th>New members (DSF)</th></tr></thead><tbody>' + rowsHtml +
+      (last ? '<tr class="total"><td colspan="2">Total</td><td>' + M.sum(M.govs, k, 'souls') + '</td><td>' + M.sum(M.govs, k, 'reh_att') + '</td><td>GHS ' + M.sum(M.govs, k, 'reh_off') + '</td><td>' + M.sum(M.govs, k, 'sun_att') + '</td><td>' + M.sum(M.govs, k, 'dsf_new') + '</td></tr>' : '') +
+    '</tbody></table></div></div>' });
+
+  // ---- one page per governor, in choir order ----
+  M.choirs.forEach(function (c) { c.governors.forEach(function (G, gi) {
+    var id = 'g' + slides.length; function v(it) { return k == null ? null : M.get(G.name, k, it); }
+    // choir box: everyone governing this choir, with this weekend's report status
+    var mates = c.governors.map(function (g) { var s = k != null && M.hasSat(g.name, k), u = k != null && M.hasSun(g.name, k);
+      return '<div class="mate' + (g === G ? ' me' : '') + '">' + face(g, 'mf') + '<span class="mn">' + esc(g.name) + '</span>' +
+        '<span class="st"><i class="' + (s ? 'ok' : 'no') + '">Sat ' + (s ? '✓' : '✗') + '</i><i class="' + (u ? 'ok' : 'no') + '">Sun ' + (u ? '✓' : '✗') + '</i></span></div>'; }).join('');
+    var choirTot = c.governors.length > 1 && k != null ? '<div class="ctot"><b>Choir this weekend:</b> ' + M.sum(c.governors, k, 'souls') + ' souls · ' + M.sum(c.governors, k, 'reh_att') + ' at rehearsal · GHS ' + M.sum(c.governors, k, 'reh_off') + ' · ' + M.sum(c.governors, k, 'sun_att') + ' on Sunday · ' + M.sum(c.governors, k, 'dsf_new') + ' new members</div>' : '';
+    var miss = [];
+    if (k != null) {
+      if (!M.hasSat(G.name, k)) miss.push('Saturday form: no report');
+      else { if (v('souls') == null) miss.push('Souls won: not reported'); if (v('reh_att') == null) miss.push('Rehearsal attendance: not reported'); if (v('reh_off') == null) miss.push('Rehearsal offering: not reported'); }
+      if (!M.hasSun(G.name, k)) miss.push('Sunday form: no report');
+      else { if (v('sun_att') == null) miss.push('Sunday attendance: not reported'); if (v('dsf_new') == null) miss.push('New members (Deep Sea Fishing): not reported'); }
+    }
+    var lateSat = k != null && M.late(G.name, k, 'sat'), lateSun = k != null && M.late(G.name, k, 'sun'), lates = [];
+    if (lateSat) lates.push('Saturday form came in ' + hm(lateSat) + ' (deadline Sat 6pm)');
+    if (lateSun) lates.push('Sunday form came in ' + hm(lateSun) + ' (deadline Sun 5pm)');
+    slides.push({ title: c.n + '. ' + c.name + ' — ' + G.name, html:
+      '<div class="leader">' +
+      '<div class="person">' + face(G, 'pic') + '</div>' +
+      '<div class="head"><div class="name">' + esc(G.name) + '</div><div class="choir">' + esc(c.name.toUpperCase()) + '</div></div>' +
+      '<div class="tbadge"><span class="badge">Choir ' + c.n + ' of 14</span></div>' +
+      '<div class="gcol two">' +
+        '<div class="gbox"><div class="cap"><span class="pill">Saturday · Rehearsal &amp; Outreach</span><span class="legend">' + sw('#ffb020') + 'Souls won on outreach</span>' + sw('var(--purple)') + 'Rehearsal attendance</span>' + sw('var(--pink)') + 'Rehearsal offering (GHS)</span></span></div><div class="area"><canvas id="' + id + 'a"></canvas></div></div>' +
+        '<div class="gbox"><div class="cap"><span class="pill">Sunday Attendance</span><span class="legend">' + sw('var(--sun)') + 'Sunday attendance</span>' + sw('var(--green)') + 'New members from Deep Sea Fishing</span></span></div><div class="area"><canvas id="' + id + 'b"></canvas></div></div>' +
+      '</div>' +
+      '<div class="rcol">' +
+        '<div class="teamlist"><h4>' + esc(c.name) + ' · ' + c.governors.length + ' governor' + (c.governors.length === 1 ? '' : 's') + '</h4>' + mates + choirTot + '</div>' +
+        '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
+          (miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') +
+          (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
+      '</div></div>',
+      draw:function () {
+        function col(it) { return W.map(function (w) { return M.get(G.name, w.key, it); }); }
+        chart(document.getElementById(id + 'a'), labels, [ plain('Souls won', col('souls'), '#ffb020'), plain('Rehearsal', col('reh_att'), '#a78bfa'), money('Rehearsal offering', col('reh_off')) ]);
+        chart(document.getElementById(id + 'b'), labels, [ plain('Sunday', col('sun_att'), '#f5c518'), plain('New members (DSF)', col('dsf_new'), '#35c27a') ]);
+      } });
+  }); });
+
+  deck.innerHTML = slides.map(function (s, i) { return '<section class="slide" id="sl' + i + '">' + s.html + '</section>'; }).join('');
+  var jump = document.getElementById('jump'); jump.innerHTML = slides.map(function (s, i) { return '<option value="' + i + '">' + (i + 1) + '. ' + esc(s.title) + '</option>'; }).join('');
+  var cur = -1, drawn = {};
+  function go(i) { i = Math.max(0, Math.min(slides.length - 1, i)); if (i === cur) return;
+    if (cur >= 0) document.getElementById('sl' + cur).classList.remove('on');
+    cur = i; document.getElementById('sl' + i).classList.add('on'); jump.value = i; document.getElementById('pos').textContent = (i + 1) + ' / ' + slides.length;
+    if (slides[i].draw && !drawn[i]) { drawn[i] = 1; slides[i].draw(); } location.hash = i + 1; }
+  document.getElementById('prev').onclick = function () { go(cur - 1); }; document.getElementById('next').onclick = function () { go(cur + 1); };
+  jump.onchange = function () { go(+jump.value); };
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === ' ') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1); });
+  window.addEventListener('hashchange', function () { go((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+  go((parseInt(location.hash.slice(1), 10) || 1) - 1);
+}, function (e) { document.body.innerHTML = '<p style="padding:20px;color:#f88">' + e.message + '</p>'; });
+</script>
+</body>
+</html>
