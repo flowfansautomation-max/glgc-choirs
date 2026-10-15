@@ -14,6 +14,6 @@ window.CHOIRS = [
   { n:10, name:'Love Never Fails Choir',  form:'LOVE NEVER FAILS CHOIR',  governors:[ { name:'Claudia Quayson', photo:'photos/claudia-quayson.jpg' } ] },
   { n:11, name:'Peace And Love Singers',  form:'PEACE AND LOVE SINGERS',  governors:[ { name:'Rejoice Amartey', photo:'photos/rejoice-amartey.jpg' }, { name:'Davidina Adagbe', photo:'photos/davidina-adagbe.jpg' }, { name:'Emmanuel Owiredu', photo:'photos/emmanuel-owiredu.jpg' } ] },
   { n:12, name:'Love Is Patient Choir',   form:'LOVE IS PATIENT CHOIR',   governors:[ { name:'Lois Nterful', photo:'photos/lois-nterful.jpg' }, { name:'Celine Ayitey', photo:'photos/celine-ayitey.jpg' }, { name:'Elizabeth Amuzu', photo:'photos/elizabeth-amuzu.jpg' } ] },
-  { n:13, name:'Unfeigned Love Choir',    form:'UNFEIGNED LOVE SINGERS',  governors:[ { name:'Ninette Dodoo', photo:'photos/ninette-dodoo.jpg' } ] },
+  { n:13, name:'Unfeigned Love Singers',   form:'UNFEIGNED LOVE SINGERS',  governors:[ { name:'Ninette Dodoo', photo:'photos/ninette-dodoo.jpg' } ] },
   { n:14, name:'Jesus Night Choir',       form:'JESUS NIGHT CHOIR',       governors:[ { name:'Ayikaikor Ankrah', photo:'photos/ayikaikor-ankrah.jpg' }, { name:'Sharon Rose Nartey', photo:'photos/sharon-rose-nartey.jpg' } ] }
 ];
