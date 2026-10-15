@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=3">
-  <script src="config.js?v=3"></script><script src="roster.js?v=3"></script><script src="manual.js?v=3"></script><script src="data.js?v=3"></script>
+  <link rel="stylesheet" href="style.css?v=4">
+  <script src="config.js?v=4"></script><script src="roster.js?v=4"></script><script src="manual.js?v=4"></script><script src="data.js?v=4"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -60,13 +60,46 @@ CH.load(function (M) {
     '</tbody></table></div></div>' });
 
   // ---- one page per governor, in choir order ----
-  M.choirs.forEach(function (c) { c.governors.forEach(function (G, gi) {
+  M.choirs.forEach(function (c) {
+    // ---- choir summary page (choirs with more than one governor), then the drill-down per governor ----
+    if (c.governors.length > 1) (function () {
+      var id = 'c' + slides.length, govs = c.governors;
+      function tot(wk, it) { var any = false, t = 0; govs.forEach(function (g) { var x = M.get(g.name, wk, it); if (x != null) { any = true; t += x; } }); return any ? t : null; }
+      function td(x, g) { return x == null ? '<td class="nr">—</td>' : '<td>' + (g ? 'GHS ' : '') + x + '</td>'; }
+      var rows = govs.map(function (g) { function v(it) { return k == null ? null : M.get(g.name, k, it); }
+        var ls = k != null && M.late(g.name, k, 'sat'), lu = k != null && M.late(g.name, k, 'sun');
+        return '<tr><td class="gw">' + face(g, 'mf') + '<span>' + esc(g.name) + ((ls || lu) ? ' <i class="lt" title="late">⏰</i>' : '') + '</span></td>' + td(v('souls')) + td(v('reh_att')) + td(v('reh_off'), 1) + td(v('sun_att')) + td(v('dsf_new')) + '</tr>'; }).join('');
+      var totRow = k == null ? '' : '<tr class="total"><td>Choir total</td>' + td(tot(k,'souls')) + td(tot(k,'reh_att')) + td(tot(k,'reh_off'), 1) + td(tot(k,'sun_att')) + td(tot(k,'dsf_new')) + '</tr>';
+      var miss = []; if (k != null) govs.forEach(function (g) { var a = []; if (!M.hasSat(g.name, k)) a.push('Saturday'); if (!M.hasSun(g.name, k)) a.push('Sunday'); if (a.length) miss.push(esc(g.name) + ': ' + a.join(' & ') + ' form'); });
+      var lates = []; if (k != null) govs.forEach(function (g) { var a = M.late(g.name, k, 'sat'), b = M.late(g.name, k, 'sun');
+        if (a) lates.push(esc(g.name) + ': Saturday form ' + hm(a)); if (b) lates.push(esc(g.name) + ': Sunday form ' + hm(b)); });
+      slides.push({ title: c.n + '. ' + c.name + ' — choir summary', html:
+        '<div class="leader">' +
+        '<div class="faces">' + govs.map(function (g) { return face(g, 'fc'); }).join('') + '</div>' +
+        '<div class="head"><div class="name">' + esc(c.name) + '</div><div class="choir">CHOIR SUMMARY</div></div>' +
+        '<div class="tbadge"><span class="badge">Choir ' + c.n + ' of 14 · ' + govs.length + ' governors</span></div>' +
+        '<div class="gcol two">' +
+          '<div class="gbox"><div class="cap"><span class="pill">Saturday · Rehearsal &amp; Outreach · whole choir</span><span class="legend">' + sw('#ffb020') + 'Souls won on outreach</span>' + sw('var(--purple)') + 'Rehearsal attendance</span>' + sw('var(--pink)') + 'Rehearsal offering (GHS)</span></span></div><div class="area"><canvas id="' + id + 'a"></canvas></div></div>' +
+          '<div class="gbox"><div class="cap"><span class="pill">Sunday Attendance · whole choir</span><span class="legend">' + sw('var(--sun)') + 'Sunday attendance</span>' + sw('var(--green)') + 'New members from Deep Sea Fishing</span></span></div><div class="area"><canvas id="' + id + 'b"></canvas></div></div>' +
+        '</div>' +
+        '<div class="rcol">' +
+          '<div class="teamlist ctbl"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'by governor</h4><table><thead><tr><th></th><th>Souls</th><th>Reh.</th><th>Offering</th><th>Sun.</th><th>New</th></tr></thead><tbody>' + rows + totRow + '</tbody></table></div>' +
+          '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
+            (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Every governor sent both forms</div>') +
+            (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
+        '</div></div>',
+        draw:function () {
+          function col(it) { return W.map(function (w) { return tot(w.key, it); }); }
+          chart(document.getElementById(id + 'a'), labels, [ plain('Souls won', col('souls'), '#ffb020'), plain('Rehearsal', col('reh_att'), '#a78bfa'), money('Rehearsal offering', col('reh_off')) ]);
+          chart(document.getElementById(id + 'b'), labels, [ plain('Sunday', col('sun_att'), '#f5c518'), plain('New members (DSF)', col('dsf_new'), '#35c27a') ]);
+        } });
+    })();
+    c.governors.forEach(function (G, gi) {
     var id = 'g' + slides.length; function v(it) { return k == null ? null : M.get(G.name, k, it); }
     // choir box: everyone governing this choir, with this weekend's report status
     var mates = c.governors.map(function (g) { var s = k != null && M.hasSat(g.name, k), u = k != null && M.hasSun(g.name, k);
       return '<div class="mate' + (g === G ? ' me' : '') + '">' + face(g, 'mf') + '<span class="mn">' + esc(g.name) + '</span>' +
         '<span class="st"><i class="' + (s ? 'ok' : 'no') + '">Sat ' + (s ? '✓' : '✗') + '</i><i class="' + (u ? 'ok' : 'no') + '">Sun ' + (u ? '✓' : '✗') + '</i></span></div>'; }).join('');
-    var choirTot = c.governors.length > 1 && k != null ? '<div class="ctot"><b>Choir this weekend:</b> ' + M.sum(c.governors, k, 'souls') + ' souls · ' + M.sum(c.governors, k, 'reh_att') + ' at rehearsal · GHS ' + M.sum(c.governors, k, 'reh_off') + ' · ' + M.sum(c.governors, k, 'sun_att') + ' on Sunday · ' + M.sum(c.governors, k, 'dsf_new') + ' new members</div>' : '';
     var miss = [];
     if (k != null) {
       if (!M.hasSat(G.name, k)) miss.push('Saturday form: no report');
@@ -87,7 +120,7 @@ CH.load(function (M) {
         '<div class="gbox"><div class="cap"><span class="pill">Sunday Attendance</span><span class="legend">' + sw('var(--sun)') + 'Sunday attendance</span>' + sw('var(--green)') + 'New members from Deep Sea Fishing</span></span></div><div class="area"><canvas id="' + id + 'b"></canvas></div></div>' +
       '</div>' +
       '<div class="rcol">' +
-        '<div class="teamlist"><h4>' + esc(c.name) + ' · ' + c.governors.length + ' governor' + (c.governors.length === 1 ? '' : 's') + '</h4>' + mates + choirTot + '</div>' +
+        '<div class="teamlist"><h4>' + esc(c.name) + ' · ' + c.governors.length + ' governor' + (c.governors.length === 1 ? '' : 's') + '</h4>' + mates + '</div>' +
         '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
           (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') +
           (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
