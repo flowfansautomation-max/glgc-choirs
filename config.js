@@ -10,8 +10,8 @@
    submission by the same governor in the same week replaces the earlier one.
    While both ids are empty the deck shows SAMPLE numbers with a banner. */
 window.CH_CONFIG = {
-  SAT: { id:'', tab:'' },
-  SUN: { id:'', tab:'' },
+  SAT: { id:'11lSkC4YpVbhK98FLjlWEATW6xhlxoyQzQkYaWhFroJc', tab:'' },
+  SUN: { id:'1ufi1oYo8M6nnslbEA_m7zQgPGSdPh4m6AjJFQM9rabo', tab:'' },
   SAT_DEADLINE_HOUR: 18,   // 6pm Saturday
   SUN_DEADLINE_HOUR: 17    // 5pm Sunday
 };

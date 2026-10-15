@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=1">
-  <script src="config.js?v=1"></script><script src="roster.js?v=1"></script><script src="manual.js?v=1"></script><script src="data.js?v=1"></script>
+  <link rel="stylesheet" href="style.css?v=2">
+  <script src="config.js?v=2"></script><script src="roster.js?v=2"></script><script src="manual.js?v=2"></script><script src="data.js?v=2"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -89,7 +89,7 @@ CH.load(function (M) {
       '<div class="rcol">' +
         '<div class="teamlist"><h4>' + esc(c.name) + ' · ' + c.governors.length + ' governor' + (c.governors.length === 1 ? '' : 's') + '</h4>' + mates + choirTot + '</div>' +
         '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
-          (miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') +
+          (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') +
           (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
       '</div></div>',
       draw:function () {

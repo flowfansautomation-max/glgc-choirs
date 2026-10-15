@@ -2,8 +2,8 @@
    form: the choir name exactly as the Google Forms dropdown spells it (used to match form rows).
    photo: put the file in photos/ and set e.g. 'photos/evanna-farhat.jpg'. */
 window.CHOIRS = [
-  { n:1,  name:'Love Is The Greatest',    form:'LOVE IS THE GREATEST',    governors:[ { name:'Evanna Farhat', photo:'' } ] },
-  { n:2,  name:'Love Is Large Choir',     form:'LOVE IS LARGE CHOIR',     governors:[ { name:'Janet Thomas', photo:'photos/janet-thomas.jpg' }, { name:'Lucia Adusei', photo:'photos/lucia-adusei.jpg' }, { name:'Antoinette Wuni', photo:'' }, { name:'Cindy Williams', photo:'photos/cindy-williams.jpg' }, { name:'Christiana Dzekoe', photo:'photos/christiana-dzekoe.jpg' } ] },
+  { n:1,  name:'Love Is The Greatest',    form:'LOVE IS THE GREATEST',    governors:[ { name:'Evanna Farhat', photo:'photos/evanna-farhat.jpg' } ] },
+  { n:2,  name:'Love Is Large Choir',     form:'LOVE IS LARGE CHOIR',     governors:[ { name:'Janet Thomas', photo:'photos/janet-thomas.jpg' }, { name:'Lucia Adusei', photo:'photos/lucia-adusei.jpg' }, { name:'Antoinette Wuni', photo:'photos/antoinette-wuni.jpg' }, { name:'Cindy Williams', photo:'photos/cindy-williams.jpg' }, { name:'Christiana Dzekoe', photo:'photos/christiana-dzekoe.jpg' } ] },
   { n:3,  name:'Love Is Kind Choir',      form:'LOVE IS KIND CHOIR',      governors:[ { name:'Keziah Ogoe', photo:'photos/keziah-ogoe.jpg' } ] },
   { n:4,  name:'God So Loved Choir',      form:'GOD SO LOVED CHOIR',      governors:[ { name:'Stephanie Bediako', photo:'photos/stephanie-bediako.jpg' }, { name:'Dorcas Oppong Poku', photo:'photos/dorcas-poku.jpg' } ] },
   { n:5,  name:'Everlasting Love Choir',  form:'EVERLASTING LOVE CHOIR',  governors:[ { name:'Hannah-Joy Adade', photo:'photos/hannah-joy-adade.jpg' } ] },
