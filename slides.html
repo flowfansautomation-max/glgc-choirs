@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=4">
-  <script src="config.js?v=4"></script><script src="roster.js?v=4"></script><script src="manual.js?v=4"></script><script src="data.js?v=4"></script>
+  <link rel="stylesheet" href="style.css?v=5">
+  <script src="config.js?v=5"></script><script src="roster.js?v=5"></script><script src="manual.js?v=5"></script><script src="data.js?v=5"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -28,7 +28,6 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function 
 function initials(n) { return n.split(/[\s-]+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase() || '?'; }
 function face(g, cls) { return g.photo ? '<img class="' + cls + '" src="' + esc(g.photo) + '" alt="">' : '<div class="' + cls + '">' + initials(g.name) + '</div>'; }
 function sw(c) { return '<span><i class="sw" style="background:' + c + '"></i> '; }
-function hm(d) { var h = d.getHours(), m = d.getMinutes(); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? 'am' : 'pm'); }
 
 CH.load(function (M) {
   var deck = document.getElementById('deck'), slides = [], W = M.weeks, last = W[W.length - 1], labels = W.map(function (w) { return ['WK ' + w.wk, w.label]; });
@@ -67,12 +66,9 @@ CH.load(function (M) {
       function tot(wk, it) { var any = false, t = 0; govs.forEach(function (g) { var x = M.get(g.name, wk, it); if (x != null) { any = true; t += x; } }); return any ? t : null; }
       function td(x, g) { return x == null ? '<td class="nr">—</td>' : '<td>' + (g ? 'GHS ' : '') + x + '</td>'; }
       var rows = govs.map(function (g) { function v(it) { return k == null ? null : M.get(g.name, k, it); }
-        var ls = k != null && M.late(g.name, k, 'sat'), lu = k != null && M.late(g.name, k, 'sun');
-        return '<tr><td class="gw">' + face(g, 'mf') + '<span>' + esc(g.name) + ((ls || lu) ? ' <i class="lt" title="late">⏰</i>' : '') + '</span></td>' + td(v('souls')) + td(v('reh_att')) + td(v('reh_off'), 1) + td(v('sun_att')) + td(v('dsf_new')) + '</tr>'; }).join('');
+        return '<tr><td class="gw">' + face(g, 'mf') + '<span>' + esc(g.name) + '</span></td>' + td(v('souls')) + td(v('reh_att')) + td(v('reh_off'), 1) + td(v('sun_att')) + td(v('dsf_new')) + '</tr>'; }).join('');
       var totRow = k == null ? '' : '<tr class="total"><td>Choir total</td>' + td(tot(k,'souls')) + td(tot(k,'reh_att')) + td(tot(k,'reh_off'), 1) + td(tot(k,'sun_att')) + td(tot(k,'dsf_new')) + '</tr>';
       var miss = []; if (k != null) govs.forEach(function (g) { var a = []; if (!M.hasSat(g.name, k)) a.push('Saturday'); if (!M.hasSun(g.name, k)) a.push('Sunday'); if (a.length) miss.push(esc(g.name) + ': ' + a.join(' & ') + ' form'); });
-      var lates = []; if (k != null) govs.forEach(function (g) { var a = M.late(g.name, k, 'sat'), b = M.late(g.name, k, 'sun');
-        if (a) lates.push(esc(g.name) + ': Saturday form ' + hm(a)); if (b) lates.push(esc(g.name) + ': Sunday form ' + hm(b)); });
       slides.push({ title: c.n + '. ' + c.name + ' — choir summary', html:
         '<div class="leader">' +
         '<div class="faces">' + govs.map(function (g) { return face(g, 'fc'); }).join('') + '</div>' +
@@ -85,8 +81,7 @@ CH.load(function (M) {
         '<div class="rcol">' +
           '<div class="teamlist ctbl"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'by governor</h4><table><thead><tr><th></th><th>Souls</th><th>Reh.</th><th>Offering</th><th>Sun.</th><th>New</th></tr></thead><tbody>' + rows + totRow + '</tbody></table></div>' +
           '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
-            (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Every governor sent both forms</div>') +
-            (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
+            (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Every governor sent both forms</div>') + '</div>' +
         '</div></div>',
         draw:function () {
           function col(it) { return W.map(function (w) { return tot(w.key, it); }); }
@@ -107,9 +102,6 @@ CH.load(function (M) {
       if (!M.hasSun(G.name, k)) miss.push('Sunday form: no report');
       else { if (v('sun_att') == null) miss.push('Sunday attendance: not reported'); if (v('dsf_new') == null) miss.push('New members (Deep Sea Fishing): not reported'); }
     }
-    var lateSat = k != null && M.late(G.name, k, 'sat'), lateSun = k != null && M.late(G.name, k, 'sun'), lates = [];
-    if (lateSat) lates.push('Saturday form came in ' + hm(lateSat) + ' (deadline Sat 6pm)');
-    if (lateSun) lates.push('Sunday form came in ' + hm(lateSun) + ' (deadline Sun 5pm)');
     slides.push({ title: c.n + '. ' + c.name + ' — ' + G.name, html:
       '<div class="leader">' +
       '<div class="person">' + face(G, 'pic') + '</div>' +
@@ -122,8 +114,7 @@ CH.load(function (M) {
       '<div class="rcol">' +
         '<div class="teamlist"><h4>' + esc(c.name) + ' · ' + c.governors.length + ' governor' + (c.governors.length === 1 ? '' : 's') + '</h4>' + mates + '</div>' +
         '<div class="wkbox"><h4>' + (last ? 'WK ' + last.wk + ' · ' : '') + 'not reported</h4>' +
-          (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') +
-          (lates.length ? '<h4 style="margin-top:.8vh">Late</h4>' + lates.map(function (m) { return '<div class="late">⏰ ' + m + '</div>'; }).join('') : '') + '</div>' +
+          (k == null ? '<div class="nr">No reports yet — the forms have no responses</div>' : miss.length ? miss.map(function (m) { return '<div class="nr">✗ ' + m + '</div>'; }).join('') : '<div style="color:var(--green)">✓ Both forms in</div>') + '</div>' +
       '</div></div>',
       draw:function () {
         function col(it) { return W.map(function (w) { return M.get(G.name, w.key, it); }); }

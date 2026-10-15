@@ -56,7 +56,7 @@ window.CH = (function () {
     });
   }
 
-  // Sample numbers, only while no sheet is connected (three weekends, a few governors silent, one late).
+  // Sample numbers, only while no sheet is connected (three weekends, a few governors silent).
   function sampleRows() { var rows = [], weeks = ['2026-09-27','2026-10-04','2026-10-11'], seed = 7;
     function rnd(a, b) { seed = (seed * 9301 + 49297) % 233280; return a + Math.floor(seed / 233280 * (b - a + 1)); }
     weeks.forEach(function (w, wi) { var sun = parseDate(w);
@@ -78,12 +78,8 @@ window.CH = (function () {
     function get(gov, k, item) { var d = data[gov] && data[gov][k]; return d && d[item] != null ? d[item] : null; }
     function hasSat(gov, k) { return get(gov, k, 'souls') != null || get(gov, k, 'reh_att') != null || get(gov, k, 'reh_off') != null; }
     function hasSun(gov, k) { return get(gov, k, 'sun_att') != null || get(gov, k, 'dsf_new') != null; }
-    // late = submitted after 6pm Saturday / 5pm Sunday of that weekend
-    function late(gov, k, kind) { var t = sub[gov] && sub[gov][k] && sub[gov][k][kind]; if (!t) return null;
-      var dl = new Date(k); if (kind === 'sat') { dl.setDate(dl.getDate() - 1); dl.setHours(CFG.SAT_DEADLINE_HOUR, 0, 0); } else dl.setHours(CFG.SUN_DEADLINE_HOUR, 0, 0);
-      return t > dl ? t : null; }
     function sum(govs, k, item) { var t = 0; govs.forEach(function (g) { var v = get(g.name, k, item); if (typeof v === 'number') t += v; }); return t; }
-    return { weeks: W, choirs: CHOIRS, govs: GOVS, get: get, hasSat: hasSat, hasSun: hasSun, late: late, sum: sum, sample: sample };
+    return { weeks: W, choirs: CHOIRS, govs: GOVS, get: get, hasSat: hasSat, hasSun: hasSun, sum: sum, sample: sample };
   }
   function load(cb, onErr) {
     var man = manualRows(), srcs = [];
