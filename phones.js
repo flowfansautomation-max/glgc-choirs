@@ -1,4 +1,4 @@
-/* Governors' phone numbers — from the list sent 16 Oct 2026 (corrections same day). Published on the public link with the user's OK (16 Oct).
+/* Governors' phone numbers — from the list sent 16 Oct 2026 (corrections same day). Published on the public link with the user's OK (16 Oct). */
 window.PHONES = {
   'Evanna Farhat':          '+233 20 431 1722',
   'Janet Thomas':           '+233 25 687 5377',
