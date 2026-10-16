@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=7">
-  <script src="config.js?v=7"></script><script src="roster.js?v=7"></script><script src="manual.js?v=7"></script><script src="contacts.js?v=7"></script><script src="phones.js?v=7"></script><script src="data.js?v=7"></script>
+  <link rel="stylesheet" href="style.css?v=8">
+  <script src="config.js?v=8"></script><script src="roster.js?v=8"></script><script src="manual.js?v=8"></script><script src="contacts.js?v=8"></script><script src="phones.js?v=8"></script><script src="data.js?v=8"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -38,8 +38,8 @@ CH.load(function (M) {
   if (M.sample) document.body.insertAdjacentHTML('afterbegin', '<div class="sample">SAMPLE NUMBERS — the two forms are not connected yet</div>');
   var deck = document.getElementById('deck'), jump = document.getElementById('jump'), wkSel = document.getElementById('wk'), slides = [], cur = -1, drawn = {}, NG = M.govs.length;
   // week picker: newest first; the deck remembers nothing, so it always opens on the latest week
-  wkSel.innerHTML = M.weeks.length ? M.weeks.map(function (w, i) { return '<option value="' + i + '">WK ' + w.wk + ' · ' + w.label + (i === M.weeks.length - 1 ? ' (latest)' : '') + '</option>'; }).reverse().join('') : '<option>No weeks yet</option>';
-  wkSel.style.display = M.weeks.length > 1 ? '' : 'none';
+  wkSel.innerHTML = M.weeks.length ? M.weeks.map(function (w, i) { return '<option value="' + i + '">Week: WK ' + w.wk + ' · ' + w.label + (i === M.weeks.length - 1 ? ' (latest)' : '') + '</option>'; }).reverse().join('') : '<option>Week: no reports yet</option>';
+  wkSel.disabled = !M.weeks.length;   // always visible, so people know where to pick an earlier week
 
   function render(sel) {
   slides = [];
