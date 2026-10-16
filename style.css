@@ -178,3 +178,7 @@ html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica
 .ctbl tr.total td { border-top:2px solid var(--gold); color:var(--gold); font-weight:bold; text-align:center; }
 .ctbl tr.total td:first-child { text-align:left; }
 .ctbl .lt { font-style:normal; font-size:1.3vh; }
+.head .contact { margin-top:.6vh; font-size:1.75vh; color:#bbb; display:flex; justify-content:center; gap:2vw; flex-wrap:wrap; }
+.head .contact span { white-space:nowrap; }
+.ctl #wk { border-color:var(--gold); color:var(--gold); font-weight:bold; }
+.gcol.two { bottom:7vh; }
