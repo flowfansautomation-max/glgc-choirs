@@ -182,3 +182,11 @@ html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica
 .head .contact span { white-space:nowrap; }
 .ctl #wk { border-color:var(--gold); color:var(--gold); font-weight:bold; }
 .gcol.two { bottom:7vh; }
+/* weekly summary: graphs left, table right */
+.sumbody { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:1.05fr 1fr; gap:2vw; padding-bottom:3vh; }
+.sumbody .gcol.sg { position:static; width:auto; height:100%; gap:1.4vh; }
+.sumbody .sumtbl { position:static; overflow:auto; min-height:0; }
+.sumbody .sumtbl table { font-size:1.5vh; width:100%; }
+.sumbody .sumtbl th { font-size:1.2vh; padding:.5vh .5vw; }
+.sumbody .sumtbl td { padding:.25vh .5vw; }
+.sumbody .sumtbl td.cn { font-size:1.45vh; white-space:normal; max-width:11vw; }

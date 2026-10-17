@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=8">
-  <script src="config.js?v=8"></script><script src="roster.js?v=8"></script><script src="manual.js?v=8"></script><script src="contacts.js?v=8"></script><script src="phones.js?v=8"></script><script src="data.js?v=8"></script>
+  <link rel="stylesheet" href="style.css?v=9">
+  <script src="config.js?v=9"></script><script src="roster.js?v=9"></script><script src="manual.js?v=9"></script><script src="contacts.js?v=9"></script><script src="phones.js?v=9"></script><script src="data.js?v=9"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -66,9 +66,18 @@ CH.load(function (M) {
   slides.push({ title:'Weekly summary', html:
     '<div class="head"><div class="name">Weekly Summary</div><div class="choir">GLGC Choirs</div><div class="gov">' + weekTxt + ' · 14 choirs · ' + NG + ' governors</div></div>' +
     '<div class="sumwrap"><div class="kpis compact" style="grid-template-columns:repeat(6,1fr)">' + tiles.map(function (t) { return '<div class="kpi" style="--kc:' + t[2] + '"><div class="lab">' + t[0] + '</div><div class="val">' + t[1] + '</div></div>'; }).join('') + '</div>' +
-    '<div class="sumtbl"><table><thead><tr><th>Choir</th><th>Governor</th><th>Souls won</th><th>Rehearsal</th><th>Rehearsal offering</th><th>Sunday</th><th>New members (DSF)</th></tr></thead><tbody>' + rowsHtml +
+    '<div class="sumbody"><div class="gcol sg">' +
+      '<div class="gbox"><div class="cap"><span class="pill">Saturday · all choirs</span><span class="legend">' + sw('#ffb020') + 'Souls won</span>' + sw('var(--purple)') + 'Rehearsal attendance</span>' + sw('var(--pink)') + 'Offering (GHS)</span></span></div><div class="area"><canvas id="suma"></canvas></div></div>' +
+      '<div class="gbox"><div class="cap"><span class="pill">Sunday · all choirs</span><span class="legend">' + sw('var(--sun)') + 'Sunday attendance</span>' + sw('var(--green)') + 'New members (DSF)</span></span></div><div class="area"><canvas id="sumb"></canvas></div></div>' +
+    '</div>' +
+    '<div class="sumtbl"><table><thead><tr><th>Choir</th><th>Governor</th><th>Souls</th><th>Reh.</th><th>Offering</th><th>Sun.</th><th>New</th></tr></thead><tbody>' + rowsHtml +
       (last ? '<tr class="total"><td colspan="2">Total</td><td>' + M.sum(M.govs, k, 'souls') + '</td><td>' + M.sum(M.govs, k, 'reh_att') + '</td><td>GHS ' + M.sum(M.govs, k, 'reh_off') + '</td><td>' + M.sum(M.govs, k, 'sun_att') + '</td><td>' + M.sum(M.govs, k, 'dsf_new') + '</td></tr>' : '') +
-    '</tbody></table></div></div>' });
+    '</tbody></table></div></div></div>',
+    draw:function () {
+      function col(it) { return W.map(function (w) { var any = false, t = 0; M.govs.forEach(function (g) { var x = M.get(g.name, w.key, it); if (x != null) { any = true; t += x; } }); return any ? t : null; }); }
+      chart(document.getElementById('suma'), labels, [ plain('Souls won', col('souls'), '#ffb020'), plain('Rehearsal', col('reh_att'), '#a78bfa'), money('Offering', col('reh_off')) ]);
+      chart(document.getElementById('sumb'), labels, [ plain('Sunday', col('sun_att'), '#f5c518'), plain('New members (DSF)', col('dsf_new'), '#35c27a') ]);
+    } });
 
   // ---- one page per governor, in choir order ----
   M.choirs.forEach(function (c) {
