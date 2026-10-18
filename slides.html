@@ -5,23 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Choirs — Weekly Reports</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=9">
-  <script src="config.js?v=9"></script><script src="roster.js?v=9"></script><script src="manual.js?v=9"></script><script src="contacts.js?v=9"></script><script src="phones.js?v=9"></script><script src="data.js?v=9"></script>
+  <link rel="stylesheet" href="style.css?v=10">
+  <script src="config.js?v=10"></script><script src="roster.js?v=10"></script><script src="manual.js?v=10"></script><script src="contacts.js?v=10"></script><script src="phones.js?v=10"></script><script src="data.js?v=10"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
   <div class="ctl"><select id="wk" title="Which week to show"></select><button id="prev">‹ Prev</button><select id="jump"></select><button id="next">Next ›</button><span class="pos" id="pos"></span></div>
 <script>
+// numbers above the bars: about 2.8% of screen height (20px on a 720px screen, 30px on 1080), never below 16px
+function LABEL_PX() { return Math.max(16, Math.round(window.innerHeight * 0.028)); }
 var valueLabels = { id:'valueLabels', afterDatasetsDraw:function (chart) { var ctx = chart.ctx;
   chart.data.datasets.forEach(function (ds, di) { var meta = chart.getDatasetMeta(di); if (meta.hidden) return;
     meta.data.forEach(function (el, i) { var v = ds.data[i]; if (v == null) return;
-      ctx.save(); ctx.fillStyle = ds.money ? '#f2938b' : '#fff'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.save(); ctx.fillStyle = ds.money ? '#f2938b' : '#fff'; ctx.font = 'bold ' + LABEL_PX() + 'px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
       ctx.fillText(ds.money ? 'GHS ' + v : v, el.x, el.y - 4); ctx.restore(); }); }); } };
 function chart(canvas, labels, datasets) {
   var scales = { x:{ ticks:{color:'#ddd',font:{size:12}}, grid:{display:false}, border:{color:'#fff'} },
                  y:{ display:false, beginAtZero:true, grace:'30%' }, y1:{ display:false, beginAtZero:true, grace:'30%', position:'right' } };
   return new Chart(canvas, { type:'bar', plugins:[valueLabels], data:{ labels:labels, datasets:datasets },
-    options:{ responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ top:18 } }, plugins:{ legend:{display:false} }, scales:scales } }); }
+    options:{ responsive:true, maintainAspectRatio:false, animation:false, layout:{ padding:{ top:LABEL_PX() + 10 } }, plugins:{ legend:{display:false} }, scales:scales } }); }
 function plain(label, data, color) { return { label:label, data:data, backgroundColor:color, borderRadius:4, maxBarThickness:44, yAxisID:'y' }; }
 function money(label, data) { return { label:label, data:data, backgroundColor:'#e2574c', borderRadius:4, maxBarThickness:44, money:true, yAxisID:'y1' }; }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]; }); }
